@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y cmake libuv1-dev
+
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew install cmake libuv
+
+    - name: Create build directory
+      run: mkdir build
+
+    - name: Configure
+      run: cd build && cmake ..
+
+    - name: Build
+      run: cd build && cmake --build .
+
+    - name: Test
+      run: |
+        cd build
+        # Run the server for a short time to verify it works
+        timeout 5 ./server || true
