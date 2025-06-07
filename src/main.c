@@ -4,7 +4,6 @@
 #include <uv.h>
 
 #define DEFAULT_BACKLOG 128
-#define TARGET_PORT 55197  // The port we want to check for collision
 
 uv_loop_t *loop;
 struct sockaddr_in addr;
@@ -87,18 +86,13 @@ void try_new_port() {
     // Get the port number
     struct sockaddr_in name;
     int namelen = sizeof(name);
-    
-    if (uv_tcp_getsockname(server, (struct sockaddr*)&name, &namelen) == 0) {
+    int err = uv_tcp_getsockname(server, (struct sockaddr*)&name, &namelen);
+    if (err == 0) {
         int port = ntohs(name.sin_port);
         printf("port %d\n", port);
-        
-        // Check if we got the target port
-        if (port == TARGET_PORT) {
-            printf("Collision!\n");
-            exit(1);
-        }
     } else {
         printf("Failed to get socket name\n");
+        printf("Error: %s\n", uv_err_name(err));
     }
     
     // Close the current server and try again
