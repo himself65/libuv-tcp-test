@@ -37,8 +37,14 @@ jobs:
     - name: Build
       run: cd build && cmake --build .
 
-    - name: Test
+    - name: Test (Linux)
+      if: matrix.os == 'ubuntu-latest'
       run: |
         cd build
-        # Run the server for a short time to verify it works
         timeout 5 ./server || true
+
+    - name: Test (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        cd build
+        (./server & sleep 5; kill $!) || true
