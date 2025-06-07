@@ -8,6 +8,8 @@ pkg_check_modules(LIBUV REQUIRED libuv)
 # Add executable
 add_executable(server src/main.c)
 
-# Link against libuv
+# Link against libuv with proper paths
 target_link_libraries(server ${LIBUV_LIBRARIES})
-target_include_directories(server PRIVATE ${LIBUV_INCLUDE_DIRS}) 
+target_include_directories(server PRIVATE ${LIBUV_INCLUDE_DIRS})
+target_link_directories(server PRIVATE ${LIBUV_LIBRARY_DIRS})
+target_compile_options(server PRIVATE ${LIBUV_CFLAGS_OTHER}) 
